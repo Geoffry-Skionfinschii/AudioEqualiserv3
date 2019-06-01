@@ -10,18 +10,18 @@ using System.Windows.Forms;
 
 namespace AudioEqualiser
 {
-  public static class FormUtils
-  {
-    private static Icon _defaultFormIcon;
-
-    public static Icon DefaultFormIcon
+    public static class FormUtils
     {
-      get
-      {
-        if (FormUtils._defaultFormIcon == null)
-          FormUtils._defaultFormIcon = (Icon) typeof (Form).GetProperty("DefaultIcon", BindingFlags.Static | BindingFlags.NonPublic).GetValue((object) null, (object[]) null);
-        return FormUtils._defaultFormIcon;
-      }
+        private static Icon _defaultFormIcon;
+
+        public static Icon DefaultFormIcon
+        {
+            get
+            {
+                if (FormUtils._defaultFormIcon == null)
+                    FormUtils._defaultFormIcon = (Icon)typeof(Form).GetProperty("DefaultIcon", BindingFlags.Static | BindingFlags.NonPublic).GetValue((object)null, (object[])null);
+                return FormUtils._defaultFormIcon;
+            }
+        }
     }
-  }
 }

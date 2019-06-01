@@ -6,12 +6,15 @@
 
 using AudioEqualiser.Properties;
 using CSCore.CoreAudioAPI;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Management;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -20,17 +23,31 @@ namespace AudioEqualiser
     internal static class Program
     {
         public static Dictionary<int, AudioSessionInformation> audioSessions = new Dictionary<int, AudioSessionInformation>();
-        private static Dictionary<int, float> audioLastVol = new Dictionary<int, float>();
+        private static readonly Dictionary<int, float> audioLastVol = new Dictionary<int, float>();
         public static Dictionary<string, ProgramSettings> programSettingData = new Dictionary<string, ProgramSettings>();
         public static float globalMaxShift = 0.005f;
         public static float globalAllowance = 0.2f;
         public static float globalVolumeTarget = 0.05f;
-        public static Form1 mainForm;
+        public static MainForm mainForm;
         private static Thread loopThread;
 
         [STAThread]
         private static void Main()
         {
+            if (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location)).Count() > 1)
+            {
+                MessageBox.Show("This application is already running");
+                Process.GetCurrentProcess().Kill();
+            }
+
+            RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            object path = key.GetValue("AudioEqualizer3Autorun");
+            if (path == null || path.ToString() != Assembly.GetEntryAssembly().Location)
+            {
+                key.SetValue("AudioEqualizer3Autorun", Assembly.GetEntryAssembly().Location);
+            }
+
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Program.LoadGlobalSettings();
@@ -66,7 +83,7 @@ namespace AudioEqualiser
             {
                 string key = keyValuePair.Key;
                 ProgramSettings programSettings = keyValuePair.Value;
-                stringCollection.Add(key + "?" + (object)programSettings.shift + "," + (object)programSettings.allowance + "," + (object)programSettings.target);
+                stringCollection.Add(key + "?" + (object)programSettings.shift + "," + (object)programSettings.allowance + "," + (object)programSettings.target + "," + (object)programSettings.ignored);
             }
             Settings.Default.ProgramSettings = stringCollection;
             Settings.Default.Save();
@@ -90,21 +107,23 @@ namespace AudioEqualiser
         private static void UpdateLoop()
         {
             Program.loopThread = new Thread((ThreadStart)(() =>
-           {
-               long num1 = 0;
-               while (true)
-               {
-                   long num2 = DateTime.Now.Ticks / 10000L;
-                   if (num1 < num2)
-                   {
-                       Program.FindAudioSources();
-                       num1 = num2 + 1000L;
-                   }
-                   Program.UpdateAudioSources();
-                   Thread.Sleep(1);
-               }
-           }));
-            Program.loopThread.IsBackground = true;
+            {
+                long num1 = 0;
+                while (true)
+                {
+                    long num2 = DateTime.Now.Ticks / 10000L;
+                    if (num1 < num2)
+                    {
+                        Program.FindAudioSources();
+                        num1 = num2 + 1000L;
+                    }
+                    Program.UpdateAudioSources();
+                    Thread.Sleep(1);
+                }
+            }))
+            {
+                IsBackground = true
+            };
             Program.loopThread.Start();
         }
 
@@ -171,8 +190,7 @@ namespace AudioEqualiser
                             sessionInformation1.session.Process.Exited += (EventHandler)((sender, e) =>
                            {
                                Process process = sender as Process;
-                               AudioSessionInformation sessionInformation;
-                               Program.audioSessions.TryGetValue(process.Id, out sessionInformation);
+                               Program.audioSessions.TryGetValue(process.Id, out AudioSessionInformation sessionInformation);
                                sessionInformation.Dispose();
                                Program.audioSessions.Remove(process.Id);
                                Program.audioLastVol.Remove(process.Id);

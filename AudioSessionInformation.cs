@@ -8,28 +8,28 @@ using CSCore.CoreAudioAPI;
 
 namespace AudioEqualiser
 {
-  public struct AudioSessionInformation
-  {
-    public int process;
-    public AudioSessionControl2 session;
-    public SimpleAudioVolume volumeObject;
-    public AudioMeterInformation audioMeter;
-    public string processName;
-
-    public AudioSessionInformation(AudioSessionControl2 session)
+    public struct AudioSessionInformation
     {
-      this.session = session;
-      this.process = session.ProcessID;
-      this.volumeObject = session.QueryInterface<SimpleAudioVolume>();
-      this.audioMeter = session.QueryInterface<AudioMeterInformation>();
-      this.processName = session.Process.ProcessName;
-    }
+        public int process;
+        public AudioSessionControl2 session;
+        public SimpleAudioVolume volumeObject;
+        public AudioMeterInformation audioMeter;
+        public string processName;
 
-    public void Dispose()
-    {
-      this.session.Dispose();
-      this.volumeObject.Dispose();
-      this.audioMeter.Dispose();
+        public AudioSessionInformation(AudioSessionControl2 session)
+        {
+            this.session = session;
+            this.process = session.ProcessID;
+            this.volumeObject = session.QueryInterface<SimpleAudioVolume>();
+            this.audioMeter = session.QueryInterface<AudioMeterInformation>();
+            this.processName = session.Process.ProcessName;
+        }
+
+        public void Dispose()
+        {
+            this.session.Dispose();
+            this.volumeObject.Dispose();
+            this.audioMeter.Dispose();
+        }
     }
-  }
 }

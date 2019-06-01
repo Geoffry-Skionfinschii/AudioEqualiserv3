@@ -6,26 +6,26 @@
 
 namespace AudioEqualiser
 {
-  public struct ProcessItem
-  {
-    public string tag;
-    public string name;
-
-    public ProcessItem(string name)
+    public struct ProcessItem
     {
-      this.name = name;
-      this.tag = "";
-    }
+        public string tag;
+        public string name;
 
-    public ProcessItem(string name, string tag)
-    {
-      this.name = name;
-      this.tag = tag;
-    }
+        public ProcessItem(string name)
+        {
+            this.name = name;
+            this.tag = "";
+        }
 
-    public override string ToString()
-    {
-      return this.name + this.tag;
+        public ProcessItem(string name, string tag)
+        {
+            this.name = name;
+            this.tag = tag;
+        }
+
+        public override string ToString()
+        {
+            return this.name + this.tag;
+        }
     }
-  }
 }

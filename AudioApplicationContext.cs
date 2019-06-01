@@ -9,36 +9,38 @@ using System.Windows.Forms;
 
 namespace AudioEqualiser
 {
-  internal class AudioApplicationContext : ApplicationContext
-  {
-    private NotifyIcon trayIcon;
-
-    public AudioApplicationContext()
+    internal class AudioApplicationContext : ApplicationContext
     {
-      this.trayIcon = new NotifyIcon()
-      {
-        Icon = FormUtils.DefaultFormIcon,
-        ContextMenu = new ContextMenu(new MenuItem[2]
+        private readonly NotifyIcon trayIcon;
+
+        public AudioApplicationContext()
         {
+            this.trayIcon = new NotifyIcon()
+            {
+                Icon = FormUtils.DefaultFormIcon,
+                ContextMenu = new ContextMenu(new MenuItem[2]
+              {
           new MenuItem("Open...", new EventHandler(this.Open)),
           new MenuItem("Exit", new EventHandler(this.Exit))
-        }),
-        Visible = true
-      };
-    }
+              }),
+                Visible = true
+            };
+        }
 
-    private void Open(object sender, EventArgs e)
-    {
-      if (Program.mainForm != null && Program.mainForm.Visible)
-        return;
-      Program.mainForm = new Form1();
-      Program.mainForm.Visible = true;
-    }
+        private void Open(object sender, EventArgs e)
+        {
+            if (Program.mainForm != null && Program.mainForm.Visible)
+                return;
+            Program.mainForm = new MainForm
+            {
+                Visible = true
+            };
+        }
 
-    private void Exit(object sender, EventArgs e)
-    {
-      this.trayIcon.Visible = false;
-      Application.Exit();
+        private void Exit(object sender, EventArgs e)
+        {
+            this.trayIcon.Visible = false;
+            Application.Exit();
+        }
     }
-  }
 }

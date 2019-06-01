@@ -6,25 +6,28 @@
 
 namespace AudioEqualiser
 {
-  public struct ProgramSettings
-  {
-    public float shift;
-    public float allowance;
-    public float target;
-
-    public ProgramSettings(string str)
+    public struct ProgramSettings
     {
-      string[] strArray = str.Split(',');
-      this.shift = float.Parse(strArray[0]);
-      this.allowance = float.Parse(strArray[1]);
-      this.target = float.Parse(strArray[2]);
-    }
+        public float shift;
+        public float allowance;
+        public float target;
+        public bool ignored;
 
-    public ProgramSettings(float shift, float allowance, float target)
-    {
-      this.shift = shift;
-      this.allowance = allowance;
-      this.target = target;
+        public ProgramSettings(string str)
+        {
+            string[] strArray = str.Split(',');
+            this.shift = float.Parse(strArray[0]);
+            this.allowance = float.Parse(strArray[1]);
+            this.target = float.Parse(strArray[2]);
+            this.ignored = bool.Parse(strArray[3]);
+        }
+
+        public ProgramSettings(float shift, float allowance, float target, bool ignored=false)
+        {
+            this.shift = shift;
+            this.allowance = allowance;
+            this.target = target;
+            this.ignored = ignored;
+        }
     }
-  }
 }
